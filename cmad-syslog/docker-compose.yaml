@@ -1,0 +1,22 @@
+version: "3.7"
+
+volumes:
+  db-data:
+
+services:  
+  syslog-server:
+    image: prakhmis/cmad-syslog-server
+    ports:
+      - 8081:8081
+    depends_on:
+      - mysql
+  mysql:
+    image: cmad-mysql
+    volumes:
+      - /opt/cmad/var/cmad-data/mysql:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    ports:
+      - "3306:3306"
