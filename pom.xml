@@ -8,6 +8,13 @@
 	<packaging>pom</packaging>
 	<name>cmad-server</name>
 
+	<modules>
+		<module>cmad-syslog</module>
+		<module>cmad-quiz</module>
+		<module>cmad-library</module>
+		<module>cmad-hello-server</module>
+	</modules>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>8</maven.compiler.source>

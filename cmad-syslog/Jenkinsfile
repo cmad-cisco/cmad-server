@@ -1,0 +1,82 @@
+pipeline{
+
+    agent none 
+
+
+    stages{
+        stage("build"){
+            agent{
+                 docker{
+                   image 'maven:3.6.1-jdk-8-slim'
+                   args '-v m2cache:/root/.m2'
+                 }
+            } 
+
+            when{
+              changeset "**/cmad-syslog/**"
+            }
+            steps{
+                echo "Building syslog app..."
+                sh 'mvn compile -pl cmad-syslog'
+            }
+        }
+        stage("test"){
+            agent{
+                 docker{
+                   image 'maven:3.6.1-jdk-8-slim'
+                   args '-v m2cache:/root/.m2'
+                 }
+            }
+            when{
+              changeset "**/cmad-syslog/**"
+            }
+            steps{
+                echo "Testing syslog app..."
+                sh 'mvn clean test -pl cmad-syslog'
+            }
+        }
+        stage("package"){
+            agent{
+                 docker{
+                   image 'maven:3.6.1-jdk-8-slim'
+                   args '-v m2cache:/root/.m2'
+                 }
+            }
+            when{
+              changeset "**/cmad-syslog/**"
+              branch 'master'
+            }
+            steps{
+                echo "Packaging syslog app..."
+                sh 'mvn package -DskipTests -pl cmad-syslog'
+                dir("cmad-syslog"){
+                  archiveArtifacts artifacts: '**/target/*.jar'
+                }
+            }
+        }
+
+       stage('docker-package'){
+         agent any
+         when{
+            changeset "**/cmad-syslog/**"
+         }
+         steps{
+           echo 'Packaging syslog app with docker'
+           script{
+             docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
+                def syslogImage = docker.build("prakhmis/cmad-syslog-server:v${env.BUILD_ID}", "./cmad-syslog")
+                syslogImage.push()
+                syslogImage.push("latest")
+             }
+          } 
+      }
+}
+
+    }
+    
+    post{
+        always{
+            echo "This pipeline run is completed.."
+        }
+    }
+}
