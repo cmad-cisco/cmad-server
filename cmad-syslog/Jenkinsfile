@@ -54,23 +54,23 @@ pipeline{
                 }
             }
         }
-
-       stage('docker-package'){
-         agent any
-         when{
-            changeset "**/cmad-syslog/**"
-         }
-         steps{
-           echo 'Packaging syslog app with docker'
-           script{
-             docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
-                def syslogImage = docker.build("prakhmis/cmad-syslog-server:v${env.BUILD_ID}", "./cmad-syslog")
-                syslogImage.push()
-                syslogImage.push("latest")
-             }
-          } 
-      }
-}
+       	stage('docker-package'){
+         	agent any
+         	when{
+            	changeset "**/cmad-syslog/**"
+         	}
+         	steps{
+           		echo 'Packaging syslog app with docker'
+           		script{
+             		docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
+             		def dockerfile = 'cmad-syslog-Dockerfile'
+                	def syslogImage = docker.build("prakhmis/cmad-syslog-server:v${env.BUILD_ID}", "-f ${dockerfile} ./")
+                	syslogImage.push()
+                	syslogImage.push("latest")
+             		}
+          		} 
+     	 	}
+		}
 
     }
     

@@ -2,7 +2,7 @@ FROM maven:3.6.1-jdk-8-slim
 
 WORKDIR /app
 
-COPY ..  .
+COPY .  .
 
 RUN mvn package -pl cmad-syslog && \
     mv cmad-syslog/target/*.jar /run/cmad-syslog.jar && \
