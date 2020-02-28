@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.cisco.cmad.dto.ErrorResponse;
 
-@ControllerAdvice
+//@ControllerAdvice
 @ResponseBody
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler
 {

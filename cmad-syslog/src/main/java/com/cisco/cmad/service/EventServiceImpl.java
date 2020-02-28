@@ -1,7 +1,9 @@
 package com.cisco.cmad.service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -28,15 +30,12 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public Page<Event> find(String source, Severity severity, LocalDateTime from, LocalDateTime to, PageRequest page) {
-		repo.findAll(getEventFindSpec(source, severity, from, to), page);
-		
-		return null;
+		return repo.findAll(getEventFindSpec(source, severity, from, to), page);
 	}
 
 	@Override
 	public int count(String source, Severity severity, LocalDateTime from, LocalDateTime to) {
-		// TODO Auto-generated method stub
-		return 0;
+		return Math.toIntExact(repo.count(getEventFindSpec(source, severity, from, to)));
 	}
 	
 	private Specification<Event> getEventFindSpec(String source, Severity severity, LocalDateTime from, LocalDateTime to) {
@@ -58,10 +57,10 @@ public class EventServiceImpl implements EventService {
 	        		  listPredicate.add(criteriaBuilder.equal(root.get("severity"), severity));
 	        	  }
 	        	  if(to != null) {
-	        		  listPredicate.add(criteriaBuilder.lessThanOrEqualTo(root.get("timestamp"), to));
+	        		  listPredicate.add(criteriaBuilder.lessThanOrEqualTo(root.get("timestamp"), Date.from( to.atZone( ZoneId.systemDefault()).toInstant())));
 	        	  }
 	        	  
-	        	  Predicate predicate = criteriaBuilder.greaterThanOrEqualTo(root.get("timestamp"), from!=null?from:LocalDateTime.now().minusHours(6));
+	        	  Predicate predicate = criteriaBuilder.greaterThanOrEqualTo(root.get("timestamp"), from!=null?Date.from(from.atZone( ZoneId.systemDefault()).toInstant()):Date.from(LocalDateTime.now().minusHours(6).atZone( ZoneId.systemDefault()).toInstant()));
 	        	  for (Predicate eachPredicate : listPredicate) {
 					predicate = criteriaBuilder.and(predicate, eachPredicate);
 				  }

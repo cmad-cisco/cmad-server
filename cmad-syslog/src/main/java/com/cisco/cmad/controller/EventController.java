@@ -29,9 +29,10 @@ import com.cisco.cmad.model.Severity;
 import com.cisco.cmad.repository.EventRepository;
 import com.cisco.cmad.service.EventService;
 
-@RestController(value = "/event")
+@RestController
 @CrossOrigin
 @Validated
+@RequestMapping(path = "/event")
 public class EventController {
 	
 	@Autowired
@@ -39,17 +40,17 @@ public class EventController {
 	@Autowired
 	private EventRepository eventRepo;
 
-	@RequestMapping(path = "/", method = RequestMethod.POST)
+	@RequestMapping( method = RequestMethod.POST)
 	public ResponseEntity<Event> save(@RequestBody Event event) {
 		event = eventRepo.save(event);
 		return new ResponseEntity<Event>(event, HttpStatus.CREATED);
 	}
 
-	@RequestMapping(path = "/", method = RequestMethod.GET)
+	@RequestMapping( method = RequestMethod.GET)
 	public ResponseEntity<PaginatedEventResult> find(@RequestParam(name = "source", defaultValue = "") String source, 
 			@RequestParam(name = "severity", defaultValue = "") Severity severity,
-			@RequestParam(name = "from", defaultValue = "") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
-			@RequestParam(name = "to", defaultValue = "") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+			@RequestParam(name = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+			@RequestParam(name = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
 			@RequestParam(name = "page", defaultValue = "1") @Min(1) Integer page,
 			@RequestParam(name = "size", defaultValue = "10") @Min(1) Integer size,
 			HttpServletRequest httpRequest) {
